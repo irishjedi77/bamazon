@@ -23,41 +23,66 @@ connection.connect(function (err) {
     if (err) throw err;
     // run the display function after the connection is made to prompt the user
 
-    start();
 });
-
-function start(){
+start();
+function start() {
     //connects to mySQL table and displays inventory
-    connection.query('SELECT * FROM products', function(err, res){
-      if(err) throw err;
-    
-      console.log("-----Welcome to Bamazon--------")
-      console.log("---------------------------------------------------------------------------------------------")
-    
-      for(var i = 0; i<res.length;i++){
-        console.log("ID: " + res[i].item_id+ " | " + "Product: " + res[i].product_name + " | " + "Department: " + res[i].department_name + " | " + "Price: " + res[i].price + " | " + "QTY: " + res[i].stock_quantity);
-        console.log("---------------------------------------------------------------------------------------------")
-      }
+    connection.query('SELECT * FROM products', function (err, res) {
+        if (err) throw err;
+
+        console.log("------------------------------------Welcome to Bamazon-----------------------------------------")
+        //console.log("---------------------------------------------------------------------------------------------")
+
+        // for (var i = 0; i < res.length; i++) {
+        //     console.log("ID: " + res[i].item_id + " | " + "Product: " + res[i].product_name + " | " + "Department: " + res[i].department_name + " | " + "Price: " + res[i].price + " | " + "QTY: " + res[i].stock_quantity);
+        //     console.log("---------------------------------------------------------------------------------------------")
+        // }
+        console.table(res);
+        userPrompt(res);
     })
 }
-userPrompt();
 
-function userPrompt() {
+function userPrompt(res) {
     inquirer
         .prompt([
+
             {
-              name: "id",
-              type: "input",
-              message: "What is the ID of the product you would like to purchase?",
-              validate: function(value) {
-                if (isNaN(value) === false) {
-                  return true;
-                }
-                return false;
-              }
+                name: "choice",
+                message: "What is the ID of the product you would like to purchase?",
+                type: "input"
+            },
+            {
+                type: 'input',
+                name: 'quantity',
+                message: 'How many items do you want to purchase?'
+
+
             }
-          ])
+        ]).then(function (answer) {
+            var query = "SELECT item_id, stock_quantity FROM products WHERE ?";
+            var chosenItem;
+            connection.query(query, { item_id: answer.choice, stock_quantity: answer.quantity }, function (err, res) {
+                if (err) throw err;
+                for (var i = 0; i < res.length; i++) {
+                    if (res[i].item_id === answer.choice) {
+                        chosenItem = res[i];
+                        console.log("You selected: " + answer.quantity + " of item# " + answer.choice)
+
+                    }
+                }
+
+            }
+
+            )
+
+
+        });
 }
+
+
+
+
+
 
 
 
