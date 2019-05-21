@@ -56,7 +56,7 @@ function userPrompt(res) {
 
       }
     ]).then(function (answer) {
-      var query = "SELECT product_name, item_id, stock_quantity FROM products WHERE item_id = ?";
+      var query = "SELECT product_name, price, item_id, stock_quantity FROM products WHERE item_id = ?";
       var chosenItem;
 
       const queryTest = connection.query(query, [answer.choice, answer.quantity], function (err, res) {
@@ -77,7 +77,7 @@ function userPrompt(res) {
           }
           ], function (err, res){
             if (err) throw err;
-            console.log("Thank you for purchasing " + chosenItem.product_name)
+            console.log("Thank you for purchasing " + chosenItem.product_name + ". Your total is " + "$" + chosenItem.price * answer.quantity)
           })
           //start();
           connection.end();
